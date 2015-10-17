@@ -107,7 +107,7 @@ class KentPyIDE(Gtk.Window):
 
         about_dialog.set_destroy_with_parent(True)
         about_dialog.set_program_name("Python IDE")
-        about_dialog.set_version("1.0")
+        about_dialog.set_version("0.1 ")
         about_dialog.set_authors(["Kent Nyberg"])
         about_dialog.set_comments("A simple yet fully working Python IDE.")
         about_dialog.set_copyright("(C) Kent Nyberg 2015. Licensed under GPL.")
