@@ -1,0 +1,2 @@
+git commit -a -m "meddelande"   #Talar om att alla ändringar ska läggas i kö för uppladdning.
+git push origin master    #Skicka upp allt som ligger i kön.
