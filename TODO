@@ -1,0 +1,21 @@
+Next to do!
+
+When create new project.
+First check if the textentries are filled.
+
+Then check if there is a project folder.  ~/ProjectName/
+if not, then create it. 
+
+Then create the project file.
+[PyIDE]
+blaha..
+Then open the main.py file, and load in in a tab in the window.
+
+
+
+* Git
+All Git-stuff should be moved to its own menu in the menu. It should not be in File-section.
+Git->
+Upload.
+Bransch.
+Replace with old version. (fetch and replace old local version with specified git-version?)

@@ -1,0 +1,5 @@
+[PyIDE]
+VERSION=1.0
+PRJ_NAME=PyIDE
+PRJ_FILES=main-ide.py
+
