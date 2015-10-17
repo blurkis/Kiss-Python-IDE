@@ -6,23 +6,33 @@ from gi.repository import Gtk
 gi.require_version('GtkSource', '3.0')
 from gi.repository import GtkSource
 from config import check_config_file
+from config import save_config_file
 import os
-
+from os.path import expanduser
 
 
 
 
 class KentPyIDE(Gtk.Window):
+    
+    ProjectFolder = expanduser("~")+"/PyIDE"
 
     def create_project(self, widget):
+        print("Folder to save projects in: " + self.ProjectFolder)
         print("Creating project..  Print out info from textentrys as a start.")
         project_name=self.project_entry_name.get_text()
         project_email=self.project_entry_email.get_text()
         project_author=self.project_entry_author.get_text()  
         print("Project name: ", project_name, "\nProject author: ", project_author, "\nemail: ", project_email)
-        print("Project folder to check for: /home/kent/" + project_name)
+        print("Project folder to check for:" + self.ProjectFolder + project_name)
 
-        if os.path.isdir("/home/kent/" + project_name):
+        if os.path.isdir(self.ProjectFolder):
+           print("PyIDE i home finns.")
+        else:
+           os.mkdir(self.ProjectFolder)
+           print("PyIDE i home fanns ej, skapar.")
+
+        if os.path.isdir(self.ProjectFolder + "/" + project_name):
            print("Project folder exists.")
            project_folder=1
            #Show information that a project with that name already exists.
@@ -33,10 +43,11 @@ class KentPyIDE(Gtk.Window):
            print("Project folder does not exist.")
            project_folder=0
            print("Creating project folder..")
-           os.mkdir("/home/kent/"+project_name)
-           project_file = open("/home/kent/"+project_name+"/"+project_name+".prj", "w")
-           project_file.write("[PyIDE]")
+           os.mkdir(self.ProjectFolder + "/" + project_name)
+           project_file = open(self.ProjectFolder + "/" + project_name+"/"+project_name+".prj", "w")
+           save_config_file(project_file)
            project_file.close()
+           #Create the files that are configured to be created in the dialog? Most often, main.py etc.
         
 
     def project_cansel_pressed(self, widget):
@@ -228,6 +239,19 @@ class KentPyIDE(Gtk.Window):
         self.menuitem_run_run.connect("activate", Gtk.main_quit)
 
         self.run_menu.append(self.menuitem_run_run)
+
+
+        self.menuitem_git = Gtk.MenuItem(label="Git")
+        self.menubar.append(self.menuitem_git)
+        self.git_menu = Gtk.Menu()
+        self.menuitem_git.set_submenu(self.git_menu)
+        self.menuitem_git_config = Gtk.MenuItem(label="Configure Git")
+        self.menuitem_git_config.connect("activate", Gtk.main_quit)
+        self.menuitem_git_commit = Gtk.MenuItem(label="Commit to git")
+        
+        self.git_menu.append(self.menuitem_git_config)
+        self.git_menu.append(self.menuitem_git_commit)
+
 
 
         self.menuitem_help = Gtk.MenuItem(label="Help")
