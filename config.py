@@ -2,17 +2,17 @@ import sys
 import os
 import configparser
 
-def save_config_file(file_to_save):
+def save_config_file(self, file_to_save):
     print("Saving project..")
     Config = configparser.ConfigParser()
     Config.add_section("PyIDE")
-    Config.set("PyIDE","VERSION", "1.0" )
-    Config.set("PyIDE", "PRJ_FILES", "main.py,config.py")
-    Config.set("PyIDE", "PRJ_NAME", "PyIDE")
-    Config.set("PyIDE", "AUTHOR", "Kent Nyberg")
-    Config.set("PyIDE", "EMAIL", "nyberg.kent@gmail.com")
+    Config.set("PyIDE","VERSION", self.ProjectDict["ProjectVersion"] )
+    Config.set("PyIDE", "PRJ_FILES", self.ProjectDict["ProjectFiles"])
+    Config.set("PyIDE", "PRJ_NAME", self.ProjectDict["ProjectName"])
+    Config.set("PyIDE", "AUTHOR", self.ProjectDict["Author"])
+    Config.set("PyIDE", "EMAIL", self.ProjectDict["Email"])
     Config.write(file_to_save)
-    
+
 
 
 def check_config_file(file_to_open):

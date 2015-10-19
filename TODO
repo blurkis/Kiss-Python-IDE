@@ -1,3 +1,5 @@
 Next to do!
 
-When creating a project, load the files created in the UI in tabs.
+New Prj from template:
+* End of function should iterate through the notebook and close every open page, and then
+  create new pages for every file in ProjectDict["ProjectFiles"].

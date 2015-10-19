@@ -14,55 +14,65 @@ from os.path import expanduser
 
 
 class KentPyIDE(Gtk.Window):
-    
     ProjectFolder = expanduser("~")+"/PyIDE"
+    ProjectDict = {"ProjectFolder": ProjectFolder, "Author": "Noname as Noname", "Email": "email@de.de",
+                  "ProjectName": "Projektname", "ProjectVersion": "ProjectVersion", "ProjectFiles": "noname"}
 
     def create_project(self, widget):
-        print("Folder to save projects in: " + self.ProjectFolder)
-        print("Creating project..  Print out info from textentrys as a start.")
-        project_name=self.project_entry_name.get_text()
+        #print("Folder to save projects in: " + self.ProjectFolder)
+        #print("Creating project..  Print out info from textentrys as a start.")
+        #print("Testar dict:" + self.ProjectDict["ProjectFolder"])
+        #project_name=self.project_entry_name.get_text()
+        self.ProjectDict["ProjectFolder"]= expanduser("~") + "/PyIDE"
+        self.ProjectDict["Author"] = self.project_entry_author.get_text()
+        self.ProjectDict["ProjectName"] = self.project_entry_name.get_text()
+        self.ProjectDict["Email"] = self.project_entry_email.get_text()
+        self.ProjectDict["ProjectFiles"]= self.ProjectDict["ProjectName"]+".py"
+
+        #print("Testar self.ProjectDict ProjectFolder: " + self.ProjectDict["ProjectFolder"])
+        #print("Testar self.ProjectDict Author: " + self.ProjectDict["Author"])
+        #print("Testar self.ProjectDict Project Name: " + self.ProjectDict["ProjectName"])
+        #print("Test self.ProjectDict Email: " + self.ProjectDict["Email"])
+        
         project_email=self.project_entry_email.get_text()
         project_author=self.project_entry_author.get_text()  
-        print("Project name: ", project_name, "\nProject author: ", project_author, "\nemail: ", project_email)
-        print("Project folder to check for:" + self.ProjectFolder + project_name)
+        #print("Project name: ", project_name, "\nProject author: ", project_author, "\nemail: ", project_email)
+        #print("Project folder to check for:" + self.ProjectFolder + "/" + project_name)
 
-        if os.path.isdir(self.ProjectFolder):
-           print("PyIDE i home finns.")
-        else:
-           os.mkdir(self.ProjectFolder)
-           print("PyIDE i home fanns ej, skapar.")
+        if not os.path.isdir(self.ProjectDict["ProjectFolder"]):
+           os.mkdir(self.ProjectDict["ProjectFolder"])
+            #print("PyIDE i home fanns ej, skapar.")
 
-        if os.path.isdir(self.ProjectFolder + "/" + project_name):
-           print("Project folder exists.")
+        if os.path.isdir(self.ProjectDict["ProjectFolder"] + "/" + self.ProjectDict["ProjectName"]):
+           #print("Project folder exists.")
            project_folder=1
            #Show information that a project with that name already exists.
            #Offer to open that project instead.
            #Cansel this function. 
            return 
         else:
-           print("Project folder does not exist.")
+           #print("Project folder does not exist.")
            project_folder=0
-           print("Creating project folder..")
-           os.mkdir(self.ProjectFolder + "/" + project_name)
-           project_file = open(self.ProjectFolder + "/" + project_name+"/"+project_name+".prj", "w")
-           save_config_file(project_file)
+           #print("Creating project folder..")
+           os.mkdir(self.ProjectDict["ProjectFolder"] + "/" + self.ProjectDict["ProjectName"])
+           project_file = open(self.ProjectDict["ProjectFolder"] + "/" + self.ProjectDict["ProjectName"] + "/"+self.ProjectDict["ProjectName"]+".prj", "w")
+           save_config_file(self, project_file)
            project_file.close()
            #Create the files that are configured to be created in the dialog? Most often, main.py etc.
         
 
     def project_cansel_pressed(self, widget):
-        print("Cansel pressed in project dialog")
+        #print("Cansel pressed in project dialog")
         self.project_window.hide()
 
     def project_hide(self, event, data):
-        print("hiding project dialog. Catched delete event from window.")
+        #print("hiding project dialog. Catched delete event from window.")
         self.project_window.hide()
         return True   #Need to return True, otherwise widgets in window is destroyed.
 
     def new_project_from_template(self, widget):
         # Should create the window in the class, and only show/hide it as wanted.  So we dont recreate it all the time.
-       print("New project_from_template   from menu.")
-
+       #print("New project_from_template   from menu.")
        self.project_window.show_all()
 
 
@@ -204,7 +214,7 @@ class KentPyIDE(Gtk.Window):
         self.menuitem_file_save = Gtk.MenuItem(label='Save project')
         self.menuitem_file_open = Gtk.MenuItem(label='Open project')
         self.menuitem_file_new_from_template = Gtk.MenuItem(label='New project from template')
-        self.menuitem_file_github_upload = Gtk.MenuItem(label='Upload to GitHub')
+        #self.menuitem_file_github_upload = Gtk.MenuItem(label='Upload to GitHub')
         self.menuitem_file_close = Gtk.MenuItem(label='Close')
         self.menuitem_file_exit = Gtk.MenuItem(label='Exit')
 
@@ -217,7 +227,7 @@ class KentPyIDE(Gtk.Window):
         self.file_menu.append(self.menuitem_file_new_from_template)
         self.file_menu.append(self.menuitem_file_open)
         self.file_menu.append(self.menuitem_file_save)
-        self.file_menu.append(self.menuitem_file_github_upload)
+        #self.file_menu.append(self.menuitem_file_github_upload)
         self.file_menu.append(self.menuitem_file_close)
         self.file_menu.append(self.menuitem_file_exit)
 
@@ -276,7 +286,8 @@ class KentPyIDE(Gtk.Window):
         scrolled_window.set_hexpand(True)
         scrolled_window.set_vexpand(True)
         #self.grid.attach(scrolled_window, 1, 2, 1, 1)
-        self.notebook.append_page(scrolled_window)
+        tmp_label = Gtk.Label("main.py")
+        self.notebook.append_page(scrolled_window, tmp_label)
 
         self.sourceview = GtkSource.View.new()
 
@@ -294,8 +305,13 @@ class KentPyIDE(Gtk.Window):
         self.textbuffer.set_text("#!/usr/bin/python\n# -*- coding: utf-8 -*-\n"
                                  )
         scrolled_window.add(self.sourceview)
+        self.notebook.show_all()
 
-
+        #split self.ProjectDict["ProjectFiles"] into a list. Do a range on it, and create tabs.
+        label = Gtk.Label(label="label main.py")
+        tab_label = Gtk.Label(label="config.py")
+        self.notebook.append_page(label, tab_label)
+        self.notebook.show_all() 
 
 win = KentPyIDE()
 win.set_default_size(500,500)
