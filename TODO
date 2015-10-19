@@ -1,5 +1,4 @@
 Next to do!
 
-New Prj from template:
-* End of function should iterate through the notebook and close every open page, and then
-  create new pages for every file in ProjectDict["ProjectFiles"].
+Create project
+* Add SourceView to every tab that is created.

@@ -16,50 +16,55 @@ from os.path import expanduser
 class KentPyIDE(Gtk.Window):
     ProjectFolder = expanduser("~")+"/PyIDE"
     ProjectDict = {"ProjectFolder": ProjectFolder, "Author": "Noname as Noname", "Email": "email@de.de",
-                  "ProjectName": "Projektname", "ProjectVersion": "ProjectVersion", "ProjectFiles": "noname"}
+                  "ProjectName": "Projektname", "ProjectVersion": "ProjectVersion", "ProjectFiles": "noname",
+                  "ProjectOpen": "No"}
 
     def create_project(self, widget):
-        #print("Folder to save projects in: " + self.ProjectFolder)
-        #print("Creating project..  Print out info from textentrys as a start.")
-        #print("Testar dict:" + self.ProjectDict["ProjectFolder"])
-        #project_name=self.project_entry_name.get_text()
+        if self.ProjectDict["ProjectOpen"]=="Yes":
+           print("Project already open. Please close existing project first.")
+           self.project_window.hide() 
+           return
         self.ProjectDict["ProjectFolder"]= expanduser("~") + "/PyIDE"
         self.ProjectDict["Author"] = self.project_entry_author.get_text()
         self.ProjectDict["ProjectName"] = self.project_entry_name.get_text()
         self.ProjectDict["Email"] = self.project_entry_email.get_text()
-        self.ProjectDict["ProjectFiles"]= self.ProjectDict["ProjectName"]+".py"
+        self.ProjectDict["ProjectFiles"]= self.ProjectDict["ProjectName"]+".py"+",hej.py,main.py"
 
-        #print("Testar self.ProjectDict ProjectFolder: " + self.ProjectDict["ProjectFolder"])
-        #print("Testar self.ProjectDict Author: " + self.ProjectDict["Author"])
-        #print("Testar self.ProjectDict Project Name: " + self.ProjectDict["ProjectName"])
-        #print("Test self.ProjectDict Email: " + self.ProjectDict["Email"])
         
         project_email=self.project_entry_email.get_text()
         project_author=self.project_entry_author.get_text()  
-        #print("Project name: ", project_name, "\nProject author: ", project_author, "\nemail: ", project_email)
-        #print("Project folder to check for:" + self.ProjectFolder + "/" + project_name)
 
         if not os.path.isdir(self.ProjectDict["ProjectFolder"]):
            os.mkdir(self.ProjectDict["ProjectFolder"])
-            #print("PyIDE i home fanns ej, skapar.")
 
         if os.path.isdir(self.ProjectDict["ProjectFolder"] + "/" + self.ProjectDict["ProjectName"]):
-           #print("Project folder exists.")
            project_folder=1
            #Show information that a project with that name already exists.
            #Offer to open that project instead.
            #Cansel this function. 
            return 
         else:
-           #print("Project folder does not exist.")
            project_folder=0
-           #print("Creating project folder..")
            os.mkdir(self.ProjectDict["ProjectFolder"] + "/" + self.ProjectDict["ProjectName"])
            project_file = open(self.ProjectDict["ProjectFolder"] + "/" + self.ProjectDict["ProjectName"] + "/"+self.ProjectDict["ProjectName"]+".prj", "w")
            save_config_file(self, project_file)
            project_file.close()
            #Create the files that are configured to be created in the dialog? Most often, main.py etc.
-        
+           Files = self.ProjectDict["ProjectFiles"].split(",")
+           #Loop over Files list, and add the files to the notebook in main window.
+
+
+
+           for file in Files:
+               label = Gtk.Label(label=file)
+               tab_label = Gtk.Label(label=file)
+               self.notebook.append_page(label, tab_label)
+               self.notebook.show_all()
+
+           self.ProjectDict["ProjectOpen"]="Yes"
+           print("Is Project open now? " + self.ProjectDict["ProjectOpen"])
+           self.project_window.hide()
+
 
     def project_cansel_pressed(self, widget):
         #print("Cansel pressed in project dialog")
@@ -120,8 +125,12 @@ class KentPyIDE(Gtk.Window):
 
 
     def close_project(self, widget):
-        print("Closing project")
-
+        Files = self.ProjectDict["ProjectFiles"].split(",")
+        nm = self.notebook.get_n_pages()
+        for x in range(0,nm):
+            self.notebook.remove_page(x)
+        self.notebook.remove_page(nm-nm)
+        self.ProjectDict["ProjectOpen"]="No"
 
     def show_about_dialog(self, widget):
         about_dialog = Gtk.AboutDialog()
@@ -281,36 +290,6 @@ class KentPyIDE(Gtk.Window):
 
 
 
-        scrolled_window= Gtk.ScrolledWindow()
-
-        scrolled_window.set_hexpand(True)
-        scrolled_window.set_vexpand(True)
-        #self.grid.attach(scrolled_window, 1, 2, 1, 1)
-        tmp_label = Gtk.Label("main.py")
-        self.notebook.append_page(scrolled_window, tmp_label)
-
-        self.sourceview = GtkSource.View.new()
-
-        self.sourceview.set_show_line_marks(True)
-        self.sourceview.set_show_line_numbers(True)
-
-        self.lm = GtkSource.LanguageManager.new()
-
-        self.textbuffer = self.sourceview.get_buffer()
-        self.textbuffer.set_language(self.lm.get_language('python'))
-        self.textbuffer.set_highlight_syntax(True)
-
-        self.textbuffer.connect("notify::cursor-position",
-                            self.cursor_changed)
-        self.textbuffer.set_text("#!/usr/bin/python\n# -*- coding: utf-8 -*-\n"
-                                 )
-        scrolled_window.add(self.sourceview)
-        self.notebook.show_all()
-
-        #split self.ProjectDict["ProjectFiles"] into a list. Do a range on it, and create tabs.
-        label = Gtk.Label(label="label main.py")
-        tab_label = Gtk.Label(label="config.py")
-        self.notebook.append_page(label, tab_label)
         self.notebook.show_all() 
 
 win = KentPyIDE()
