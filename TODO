@@ -1,4 +1,4 @@
 Next to do!
 
-Create project
-* Add SourceView to every tab that is created.
+In create from template:
+*For every keystroke in Project, check if projectname is busy. If so, then cansel the Create-button.

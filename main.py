@@ -28,7 +28,7 @@ class KentPyIDE(Gtk.Window):
         self.ProjectDict["Author"] = self.project_entry_author.get_text()
         self.ProjectDict["ProjectName"] = self.project_entry_name.get_text()
         self.ProjectDict["Email"] = self.project_entry_email.get_text()
-        self.ProjectDict["ProjectFiles"]= self.ProjectDict["ProjectName"]+".py"+",hej.py,main.py"
+        self.ProjectDict["ProjectFiles"]= self.ProjectDict["ProjectName"]+".py"
 
         
         project_email=self.project_entry_email.get_text()
@@ -56,9 +56,32 @@ class KentPyIDE(Gtk.Window):
 
 
            for file in Files:
-               label = Gtk.Label(label=file)
-               tab_label = Gtk.Label(label=file)
-               self.notebook.append_page(label, tab_label)
+               scrolled_window = Gtk.ScrolledWindow()
+               scrolled_window.set_hexpand(True)
+               scrolled_window.set_vexpand(True)
+
+               self.sourceview = GtkSource.View.new()
+               self.sourceview.set_show_line_marks(True)
+               self.sourceview.set_show_line_numbers(True)
+
+               self.lm = GtkSource.LanguageManager.new()
+
+               self.textbuffer = self.sourceview.get_buffer()
+               self.textbuffer.set_language(self.lm.get_language('python'))
+               self.textbuffer.set_highlight_syntax(True)
+
+               self.textbuffer.connect("notify::cursor-position",
+                            self.cursor_changed)
+               self.textbuffer.set_text("#!/usr/bin/python\n# -*- coding: utf-8 -*-\n"
+                                 )
+
+
+
+
+               scrolled_window.add(self.sourceview)
+
+               tab_label = Gtk.Label(label=file) #The label for the notebooktab.
+               self.notebook.append_page(scrolled_window, tab_label)
                self.notebook.show_all()
 
            self.ProjectDict["ProjectOpen"]="Yes"
