@@ -15,7 +15,7 @@ def save_config_file(self, file_to_save):
 
 
 
-def check_config_file(file_to_open):
+def check_config_file(self, file_to_open):
     print("PRJ file to check " + str(file_to_open))
     ConfigOK=1
     Config = configparser.ConfigParser()
@@ -25,11 +25,11 @@ def check_config_file(file_to_open):
     except:
         ConfigOK=0
     try:
-        Config.get('PyIDE','PRJ_FILES')
+        self.ProjectDict["ProjectFiles"] =  Config.get('PyIDE','PRJ_FILES')
     except:
         ConfigOK=0
     try:
-        Config.get('PyIDE','PRJ_NAME')
+       self.ProjectDict["ProjectName"] =  Config.get('PyIDE','PRJ_NAME')
     except:
         ConfigOK=0
     if ConfigOK ==1:

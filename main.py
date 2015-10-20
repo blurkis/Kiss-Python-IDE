@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-  5288
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -18,6 +18,13 @@ class KentPyIDE(Gtk.Window):
     ProjectDict = {"ProjectFolder": ProjectFolder, "Author": "Noname as Noname", "Email": "email@de.de",
                   "ProjectName": "Projektname", "ProjectVersion": "ProjectVersion", "ProjectFiles": "noname",
                   "ProjectOpen": "No"}
+
+    def check_project_entry(self, widget):
+        #self.project_entry_name, project_create_button, project_cansel_button
+        if "" == self.project_entry_name.get_text():
+           self.project_create_button.set_sensitive(False)
+        else:
+           self.project_create_button.set_sensitive(True)
 
     def create_project(self, widget):
         if self.ProjectDict["ProjectOpen"]=="Yes":
@@ -126,13 +133,40 @@ class KentPyIDE(Gtk.Window):
             print("No file to open")
             file_dialog.destroy()
         else:
-            fp = check_config_file(tmp)  # Should return something to tell if the config is wrong.
-            file_to_open = open(fp, "r")
+            fp = check_config_file(self,tmp)  # Should return something to tell if the config is wrong.
+            print(fp)
+            file_to_open = open(self.ProjectDict["ProjectFolder"] + "/" + self.ProjectDict["ProjectName"] + "/" + fp, "r")
 	    #Check the prj config file. Sort of.
             
 
             text = file_to_open.read()
+
+            scrolled_window = Gtk.ScrolledWindow()
+            scrolled_window.set_hexpand(True)
+            scrolled_window.set_vexpand(True)
+
+            self.sourceview = GtkSource.View.new()
+            self.sourceview.set_show_line_marks(True)
+            self.sourceview.set_show_line_numbers(True)
+
+            self.lm = GtkSource.LanguageManager.new()
+
+            self.textbuffer = self.sourceview.get_buffer()
+            self.textbuffer.set_language(self.lm.get_language('python'))
+            self.textbuffer.set_highlight_syntax(True)
+
+            self.textbuffer.connect("notify::cursor-position",self.cursor_changed)
+
             self.textbuffer.set_text(text)
+
+            scrolled_window.add(self.sourceview)
+
+            tab_label = Gtk.Label(label="hej") #The label for the notebooktab.
+            self.notebook.append_page(scrolled_window, tab_label)
+            self.notebook.show_all()
+
+
+
             file_dialog.destroy()
 
 
@@ -143,7 +177,8 @@ class KentPyIDE(Gtk.Window):
         buffer= self.sourceview.get_buffer()
         startiter, enditer = buffer.get_bounds()
         text = buffer.get_text(startiter, enditer, True)
-        file_to_save = open("main-ide.py", "r+")
+        #This should iterate over the files in the project and their sourceview and save every buffer.
+        file_to_save = open(self.ProjectDict["ProjectFolder"] + "/" + self.ProjectDict["ProjectName"] + "/" + self.ProjectDict["ProjectFiles"], "w")
         file_to_save.write(text)
 
 
@@ -218,6 +253,7 @@ class KentPyIDE(Gtk.Window):
         self.project_grid.attach(self.project_email, 1, 2, 1, 1)
        
         self.project_create_button = Gtk.Button("Create project")
+        self.project_create_button.set_sensitive(False)
         self.project_grid.attach(self.project_create_button, 1,3,1,1)
         self.project_cansel_button = Gtk.Button("Cansel project")
         self.project_grid.attach(self.project_cansel_button, 2,3,1,1)
@@ -225,6 +261,9 @@ class KentPyIDE(Gtk.Window):
         self.project_entry_name = Gtk.Entry()
         self.project_entry_email = Gtk.Entry()
         self.project_entry_author = Gtk.Entry()
+        #Connect a signal to keystrokes project_entry_name, and if its occypied.. cansel create-button.
+        self.project_entry_name.connect("changed", self.check_project_entry)
+
  
         self.project_grid.attach(self.project_entry_name, 2, 0, 1, 1)
         self.project_grid.attach(self.project_entry_author, 2, 1, 1, 1)	
